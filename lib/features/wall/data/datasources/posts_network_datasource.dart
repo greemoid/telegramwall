@@ -17,13 +17,23 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
   @override
   Future<List<PostModel>> parsePosts() async {
     try {
-      final response = await dio.get('https://t.me/s/book_uaa');
+      final response = await dio.get(
+          'https://thingproxy.freeboard.io/fetch/https://t.me/s/book_uaa',
+          options: Options(headers: {
+            "Access-Control-Allow-Origin": "*",
+            // Required for CORS support to work
+            "Access-Control-Allow-Credentials": true,
+            // Required for cookies, authorization headers with HTTPS
+            "Access-Control-Allow-Headers":
+                "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+          }));
       dom.Document document = parser.parse(response.data);
-
 
       final posts = document.getElementsByClassName('tgme_widget_message_wrap');
       var postTextHtml = '';
       var channel = '';
+      String? avatarUrl = '';
       var dateTime = '';
       var imageUrl = '';
       var videoUrl = '';
@@ -32,12 +42,18 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
       for (final post in posts) {
         // Extract owner name
         var ownerElement =
-        post.querySelector('.tgme_widget_message_owner_name');
+            post.querySelector('.tgme_widget_message_owner_name');
         channel = ownerElement != null ? ownerElement.text.trim() : 'John Doe';
 
         // Extract post text
         var postElement = post.querySelector('.tgme_widget_message_text');
         postTextHtml = postElement != null ? postElement.innerHtml : '';
+
+        // Extract channel's avatar
+        var avatarElement =
+            post.querySelector('.tgme_widget_message_user_photo img');
+        avatarUrl =
+            avatarElement != null ? avatarElement.attributes['src'] : '';
 
         // Extract views count
         var viewsElement = post.querySelector('.tgme_widget_message_views');
@@ -46,10 +62,11 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
         // Extract date of publish
         var dateElement = post.querySelector('.tgme_widget_message_date time');
         dateTime =
-        (dateElement != null ? dateElement.attributes['datetime'] : '')!;
+            (dateElement != null ? dateElement.attributes['datetime'] : '')!;
         final postModel = PostModel(
           postTextHtml,
           channel,
+          avatarUrl,
           dateTime,
           imageUrl,
           videoUrl,
@@ -58,8 +75,9 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
 
         listOfPosts.add(postModel);
       }
+      GetIt.I<Talker>().warning(listOfPosts.length);
       for (final post in listOfPosts) {
-        GetIt.I<Talker>().info(post.toString());
+        GetIt.I<Talker>().info(post.avatarUrl);
       }
 
       return listOfPosts;

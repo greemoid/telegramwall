@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class PostWidget extends StatelessWidget {
-  PostWidget({super.key, required this.title, required this.postTextHtml});
+  PostWidget({
+    super.key,
+    required this.title,
+    required this.postTextHtml,
+    required this.avatarUrl,
+  });
 
   String title;
   String postTextHtml;
+  String avatarUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,7 @@ class PostWidget extends StatelessWidget {
         children: [
           ClipOval(
             child: Image.network(
-              imageUrlMock,
+              avatarUrl,
               height: 32,
               width: 32,
               fit: BoxFit.cover,
@@ -49,9 +55,13 @@ class PostWidget extends StatelessWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w600),
                     ),
-                    HtmlWidget(postTextHtml, textStyle: const TextStyle(
+                    HtmlWidget(
+                      postTextHtml,
+                      textStyle: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,),)
+                        fontSize: 14,
+                      ),
+                    )
                   ],
                 ),
               ),

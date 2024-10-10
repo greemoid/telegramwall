@@ -1,6 +1,7 @@
 class Post {
   String? postTextHtml;
   String? channel;
+  String? avatarUrl;
   String? dateTime;
   String? imageUrl;
   String? videoUrl;
@@ -9,6 +10,7 @@ class Post {
   Post(
     this.postTextHtml,
     this.channel,
+    this.avatarUrl,
     this.dateTime,
     this.imageUrl,
     this.videoUrl,

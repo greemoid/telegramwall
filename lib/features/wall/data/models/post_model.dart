@@ -4,6 +4,7 @@ class PostModel extends Post {
   PostModel(
     super.postTextHtml,
     super.channel,
+    super.avatarUrl,
     super.dateTime,
     super.imageUrl,
     super.videoUrl,
@@ -12,10 +13,11 @@ class PostModel extends Post {
 
   @override
   String toString() {
-    return 'PostModel{$postTextHtml $channel $dateTime $imageUrl $videoUrl $viewsCount}';
+    return 'PostModel{$postTextHtml $channel $avatarUrl $dateTime $imageUrl $videoUrl $viewsCount}';
   }
 
   Post toPost() {
-    return Post(postTextHtml, channel, dateTime, imageUrl, videoUrl, viewsCount);
+    return Post(postTextHtml, channel, avatarUrl, dateTime, imageUrl, videoUrl,
+        viewsCount);
   }
 }

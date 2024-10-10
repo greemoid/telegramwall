@@ -15,7 +15,7 @@ class PostsListBloc extends Bloc<PostsListEvent, PostsListState> {
       : _postsRepository = postsRepository,
         super(PostsListInitial()) {
     on<PostsListEvent>((event, emit) {
-      PostsListLoading();
+      emit(PostsListLoading());
     });
     on<FetchPostsEvent>(_fetchPosts);
   }
@@ -23,8 +23,9 @@ class PostsListBloc extends Bloc<PostsListEvent, PostsListState> {
   void _fetchPosts(FetchPostsEvent event, Emitter<PostsListState> emit) async {
     try {
       final result = await _postsRepository.getPostsFromChannel();
-      GetIt.I<Talker>().info("BlocList: ${result.toString()}");
-      emit(PostsListLoaded(listOfPosts: result));
+      GetIt.I<Talker>().warning(result.length);
+
+      emit(PostsListLoaded(listOfPosts: result.reversed.toList()));
     } catch (e, st) {
       GetIt.I<Talker>().handle(e, st);
     }
