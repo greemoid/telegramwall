@@ -55,7 +55,7 @@ class _WallScreenState extends State<WallScreen> {
               return ListView.builder(
                   itemCount: state.listOfPosts.length,
                   itemBuilder: (context, index) {
-                    GetIt.I<Talker>().warning(state.listOfPosts.length);
+                    // GetIt.I<Talker>().warning(state.listOfPosts.length);
 
                     return PostWidget(
                       title: state.listOfPosts[index].channel ?? '',
