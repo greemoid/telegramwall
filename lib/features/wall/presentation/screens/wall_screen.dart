@@ -56,11 +56,13 @@ class _WallScreenState extends State<WallScreen> {
                   itemCount: state.listOfPosts.length,
                   itemBuilder: (context, index) {
                     // GetIt.I<Talker>().warning(state.listOfPosts.length);
+                    final post = state.listOfPosts[index];
 
                     return PostWidget(
-                      title: state.listOfPosts[index].channel ?? '',
-                      postTextHtml: state.listOfPosts[index].postTextHtml ?? '',
-                      avatarUrl: state.listOfPosts[index].avatarUrl ?? '',
+                      title: post.channel ?? '',
+                      postTextHtml: post.postTextHtml ?? '',
+                      avatarUrl: post.avatarUrl ?? '',
+                      imageUrls: post.imageUrls ?? [],
                     );
                   });
             }

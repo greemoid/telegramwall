@@ -3,7 +3,7 @@ class Post {
   String? channel;
   String? avatarUrl;
   String? dateTime;
-  String? imageUrl;
+  List<String>? imageUrls;
   String? videoUrl;
   String? viewsCount;
 
@@ -12,7 +12,7 @@ class Post {
     this.channel,
     this.avatarUrl,
     this.dateTime,
-    this.imageUrl,
+    this.imageUrls,
     this.videoUrl,
     this.viewsCount,
   );

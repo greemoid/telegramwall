@@ -16,7 +16,7 @@ class PostModel extends Post {
     super.channel,
     super.avatarUrl,
     super.dateTime,
-    super.imageUrl,
+    super.imageUrls,
     super.videoUrl,
     super.viewsCount,
   );
@@ -27,18 +27,18 @@ class PostModel extends Post {
         json['channel'] as String,
         json['avatarUrl'] as String,
         json['dateTime'] as String,
-        json['imageUrl'] as String,
+        json['imageUrl'] as List<String>,
         json['videoUrl'] as String,
         json['viewsCount'] as String);
   }
 
   @override
   String toString() {
-    return 'PostModel{$postTextHtml $channel $avatarUrl $dateTime $imageUrl $videoUrl $viewsCount}';
+    return 'PostModel{$postTextHtml $channel $avatarUrl $dateTime $imageUrls $videoUrl $viewsCount}';
   }
 
   Post toPost() {
-    return Post(postTextHtml, channel, avatarUrl, dateTime, imageUrl, videoUrl,
+    return Post(postTextHtml, channel, avatarUrl, dateTime, imageUrls, videoUrl,
         viewsCount);
   }
 }

@@ -54,14 +54,22 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
 
         final posts =
             document.getElementsByClassName('tgme_widget_message_wrap');
-        var postTextHtml = '';
-        var channel = '';
-        String? avatarUrl = '';
-        var dateTime = '';
-        var imageUrl = '';
-        var videoUrl = '';
+        // var postTextHtml = '';
+        // var channel = '';
+        // String? avatarUrl = '';
+        // var dateTime = '';
+        // List<String> imageUrls = [];
+        // List<String> videoUrls = [];
         var viewsCount = '';
         for (final post in posts) {
+          // Initialize or reset data for the current post
+          var postTextHtml = '';
+          var channel = '';
+          String? avatarUrl = '';
+          var dateTime = '';
+          List<String> imageUrls = []; // Clear imageUrls for each new post
+          var viewsCount = '';
+
           // Extract owner name
           var ownerElement =
               post.querySelector('.tgme_widget_message_owner_name');
@@ -87,16 +95,65 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
               post.querySelector('.tgme_widget_message_date time');
           dateTime =
               (dateElement != null ? dateElement.attributes['datetime'] : '')!;
-          final postModel = PostModel(
-              postTextHtml, channel, avatarUrl, dateTime, '', '', viewsCount);
+
+          // Extract image urls
+          List<dom.Element?> imageList = [];
+          imageList
+              .addAll(post.querySelectorAll('.tgme_widget_message_photo_wrap'));
+
+          if (imageList.isNotEmpty) {
+            for (var imageElement in imageList) {
+              // Get the style attribute
+              String? style = imageElement?.attributes['style'];
+
+              // Use a regex to extract the URL from the style
+              if (style != null) {
+                final regex = RegExp(r"url\('?(.*?)'?\)", caseSensitive: false);
+                final match = regex.firstMatch(style);
+                if (match != null && match.groupCount > 0) {
+                  imageUrls
+                      .add(match.group(1) ?? ''); // Add the URL to the list
+                }
+              }
+            }
+          }
+
+          // todo: make a placeholder with button that goes to telegram
+          // todo: add video_player_media_kit lib
+          // Extract image urls
+          // List<dom.Element?> videoList = [];
+          // var videoListElement =
+          // videoList.add(post.querySelector('.tgme_widget_message_video_thumb'));
+          //
+          // if (videoList.isNotEmpty) {
+          //   for (var videoElement in videoList) {
+          //     // Get the style attribute
+          //     String? style = videoElement?.attributes['style'];
+          //     GetIt.I<Talker>().warning('style: $style');
+          //
+          //     // Use a regex to extract the URL from the style
+          //     if (style != null) {
+          //       final regex = RegExp(r"url\('?(.*?)'?\)", caseSensitive: false);
+          //       final match = regex.firstMatch(style);
+          //       GetIt.I<Talker>().warning('style: $match');
+          //       if (match != null && match.groupCount > 0) {
+          //         videoUrls.add(match.group(1) ?? ''); // Add the URL to the list
+          //       }
+          //     }
+          //   }
+          //   for (var str in videoUrls) {
+          //     GetIt.I<Talker>().warning(str);
+          //   }
+          // }
+
+          final postModel = PostModel(postTextHtml, channel, avatarUrl,
+              dateTime, imageUrls, '', viewsCount);
 
           listOfPosts.add(postModel);
-
-          // GetIt.I<Talker>().warning(listOfPosts.length);
         }
       }
 
-      listOfPosts.sort((a,b) {
+      listOfPosts.sort((a, b) {
         DateTime dateA = DateTime.parse(a.dateTime ?? '');
         DateTime dateB = DateTime.parse(b.dateTime ?? '');
         return dateA.compareTo(dateB);
