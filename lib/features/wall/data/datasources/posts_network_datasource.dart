@@ -27,7 +27,8 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
       List<String> channelHtmlList = [];
 
       final gotFromNetwork = DateTime.now();
-      GetIt.I<Talker>().warning('Got htmls from network ${gotFromNetwork.millisecondsSinceEpoch - start.millisecondsSinceEpoch} milliseconds = ${(gotFromNetwork.millisecondsSinceEpoch - start.millisecondsSinceEpoch) / 1000} seconds');
+      GetIt.I<Talker>().warning(
+          'Got htmls from network ${gotFromNetwork.millisecondsSinceEpoch - start.millisecondsSinceEpoch} milliseconds = ${(gotFromNetwork.millisecondsSinceEpoch - start.millisecondsSinceEpoch) / 1000} seconds');
 
       for (var item in items) {
         if (item['channelHtml'] != null) {
@@ -104,11 +105,14 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
           }
 
           // Parse the video link
-          var videoElement = post.querySelector('a.tgme_widget_message_video_player');
-          String? videoLink = videoElement?.attributes['href']; // Get the video URL
+          var videoElement =
+              post.querySelector('a.tgme_widget_message_video_player');
+          String? videoLink =
+              videoElement?.attributes['href']; // Get the video URL
 
           // Parse the video thumbnail (background image)
-          var thumbElement = videoElement?.querySelector('.tgme_widget_message_video_thumb');
+          var thumbElement =
+              videoElement?.querySelector('.tgme_widget_message_video_thumb');
           String? style = thumbElement?.attributes['style'];
           String? thumbnailUrl;
 
@@ -119,12 +123,6 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
               thumbnailUrl = match.group(1); // Get the thumbnail URL
               mediaUrls.add(MediaModel(true, '', thumbnailUrl));
             }
-          }
-
-          // GetIt.I<Talker>().warning('Video link: $videoLink');
-          // GetIt.I<Talker>().warning('Thumbnail URL: $thumbnailUrl');
-          for (var media in mediaUrls) {
-            GetIt.I<Talker>().warning('Media: ${media.toString()}');
           }
 
           final postModel = PostModel(postTextHtml, channel, avatarUrl,
@@ -140,7 +138,8 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
         return dateA.compareTo(dateB);
       });
       final end = DateTime.now();
-      GetIt.I<Talker>().warning('Parsed everything: ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch} milliseconds = ${(end.millisecondsSinceEpoch - start.millisecondsSinceEpoch) / 1000} seconds');
+      GetIt.I<Talker>().warning(
+          'Parsed everything: ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch} milliseconds = ${(end.millisecondsSinceEpoch - start.millisecondsSinceEpoch) / 1000} seconds');
       return listOfPosts;
     } catch (e, st) {
       GetIt.I<Talker>().handle(e, st);

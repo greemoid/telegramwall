@@ -126,25 +126,34 @@
 // const blogText =
 //     'друзья я прекрасно понимаю что уже давно не выпускал новой музыки но это потому что все силы максимально брошены в альбом ХАН. Мне не хочется до альбома ХАН выпускать ничего что могло бы опустить уровень ожидания а потому прошу вас потерпеть еще совсем немного альбом почти готов';
 
+import 'dart:ui';
 
 import 'package:durovswall/features/wall/domain/media.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:full_screen_image/full_screen_image.dart';
+import 'package:insta_image_viewer/insta_image_viewer.dart';
 
-class PostWidget extends StatelessWidget {
-  PostWidget({
+class PostWidget extends StatefulWidget {
+  const PostWidget({
     super.key,
     required this.title,
     required this.postTextHtml,
     required this.avatarUrl,
-    required this.imageUrls,
+    required this.mediaUrls,
   });
 
   final String title;
   final String postTextHtml;
   final String avatarUrl;
-  final List<Media> imageUrls;
+  final List<Media> mediaUrls;
+
+  @override
+  State<PostWidget> createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +164,7 @@ class PostWidget extends StatelessWidget {
         children: [
           ClipOval(
             child: Image.network(
-              avatarUrl,
+              widget.avatarUrl,
               height: 32,
               width: 32,
               fit: BoxFit.cover,
@@ -182,7 +191,7 @@ class PostWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      widget.title,
                       style: const TextStyle(
                         color: Colors.red,
                         fontSize: 15,
@@ -190,47 +199,85 @@ class PostWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (imageUrls.isNotEmpty)
-                      GridView.builder(
-                        itemCount: imageUrls.length,
-                        shrinkWrap: true, // Prevent GridView from taking infinite height
-                        physics: const NeverScrollableScrollPhysics(), // Disable inner scrolling
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 4,
-                          crossAxisSpacing: 4,
-                          childAspectRatio: 1.0,
+                    if (widget.mediaUrls.isNotEmpty)
+                      FlutterCarousel(
+                        options: FlutterCarouselOptions(
+                          height: 400.0,
+                          showIndicator: true,
+                          enableInfiniteScroll: false,
+                          slideIndicator: CircularSlideIndicator(),
                         ),
-                        itemBuilder: (context, index) {
-                          return FullScreenWidget(
-                            disposeLevel: DisposeLevel.Low,
-                            child: Image.network(
-                              imageUrls[index].imageUrl ?? '',
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: progress.expectedTotalBytes != null
-                                        ? progress.cumulativeBytesLoaded /
-                                        (progress.expectedTotalBytes ?? 1)
-                                        : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.error,
-                                  color: Colors.red,
-                                );
-                              },
-                            ),
+                        items: widget.mediaUrls.map((media) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              if (media.isVideo) {
+                                return Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      ImageFiltered(
+                                        imageFilter: ImageFilter.blur(
+                                            sigmaX: 5, sigmaY: 5),
+                                        child: Image.network(
+                                          media.videoUrl ?? '',
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTapDown: (_) {
+                                          setState(() {
+                                            _isPressed = true;
+                                          });
+                                        },
+                                        onTapUp: (_) {
+                                          setState(() {
+                                            _isPressed = false;
+                                          });
+                                        },
+                                        onTapCancel: () {
+                                          setState(() {
+                                            _isPressed = false;
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 1),
+                                          decoration: BoxDecoration(
+                                              color: _isPressed
+                                                  ? const Color(0xFFFFFFFF)
+                                                  : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0),
+                                              border: Border.all(
+                                                  color: Colors.white)),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 24, vertical: 12),
+                                          child: Text(
+                                            'View in telegram',
+                                            style: TextStyle(
+                                              color: _isPressed
+                                                  ? const Color(0xFF000000)
+                                                  : const Color(0xFFFFFFFF),
+                                              // Text color
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ]);
+                              } else {
+                                return InstaImageViewer(
+                                    child: Image.network(
+                                  media.imageUrl ?? '',
+                                  fit: BoxFit.contain,
+                                ));
+                              }
+                            },
                           );
-                        },
+                        }).toList(),
                       ),
                     const SizedBox(height: 8),
                     HtmlWidget(
-                      postTextHtml,
+                      widget.postTextHtml,
                       textStyle: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,

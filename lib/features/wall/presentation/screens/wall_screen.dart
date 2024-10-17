@@ -63,7 +63,7 @@ class _WallScreenState extends State<WallScreen> {
                       title: post.channel ?? '',
                       postTextHtml: post.postTextHtml ?? '',
                       avatarUrl: post.avatarUrl ?? '',
-                      imageUrls: post.mediaUrl ?? [],
+                      mediaUrls: post.mediaUrl ?? [],
                     );
                   });
             }
