@@ -1,5 +1,5 @@
+import 'package:durovswall/features/wall/domain/media.dart';
 import 'package:durovswall/features/wall/domain/post.dart';
-
 
 /// avatarUrl : "https://cdn4.cdn-telegram.org/file/SfPHzoMmYsofBSCGslR45rslKEYNYz9gOgXDJYdiFAxJJ2i4nRQL5MEtvFdzRvZg_imgwmkxu14Tf8U2Z7vro-mrxkjyJ8CYFdQcSfXLrlqpYd-RwTTvwHorEMgoUayyuLlXPBnQCk_GQzodo2QYwQSEDMqANMOyaa8iqSLOOIjDQbCnDFYwIweWDXzCAd_EaE39qTr4m3-IJZ5RUzesQOvIysp3_Yz3zTIXV5t73NNbJYFqgQG9-0uS4dPVk8BuxxQvdlNsFFRol8lneUIL5t2zNfSFK9DzPgPtvF4HjaNBv-hXBPtrwy3rgzeaQ4drO-jLv7XIEsoYzlVO4DBrcw.jpg"
 /// channel : "Книги українською 🇺🇦"
@@ -9,14 +9,13 @@ import 'package:durovswall/features/wall/domain/post.dart';
 /// videoUrl : ""
 /// viewsCount : "3.6K"
 
-
 class PostModel extends Post {
   PostModel(
     super.postTextHtml,
     super.channel,
     super.avatarUrl,
     super.dateTime,
-    super.imageUrls,
+    super.mediaUrl,
     super.videoUrl,
     super.viewsCount,
   );
@@ -27,18 +26,16 @@ class PostModel extends Post {
         json['channel'] as String,
         json['avatarUrl'] as String,
         json['dateTime'] as String,
-        json['imageUrl'] as List<String>,
+        json['imageUrl'] as List<Media>,
         json['videoUrl'] as String,
         json['viewsCount'] as String);
   }
 
   @override
   String toString() {
-    return 'PostModel{$postTextHtml $channel $avatarUrl $dateTime $imageUrls $videoUrl $viewsCount}';
+    return 'PostModel{$postTextHtml $channel $avatarUrl $dateTime $mediaUrl $videoUrl $viewsCount}';
   }
 
-  Post toPost() {
-    return Post(postTextHtml, channel, avatarUrl, dateTime, imageUrls, videoUrl,
-        viewsCount);
-  }
+  Post toPost() => Post(postTextHtml, channel, avatarUrl, dateTime, mediaUrl,
+      videoUrl, viewsCount);
 }

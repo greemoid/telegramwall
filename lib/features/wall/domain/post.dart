@@ -1,9 +1,11 @@
+import 'package:durovswall/features/wall/domain/media.dart';
+
 class Post {
   String? postTextHtml;
   String? channel;
   String? avatarUrl;
   String? dateTime;
-  List<String>? imageUrls;
+  List<Media>? mediaUrl;
   String? videoUrl;
   String? viewsCount;
 
@@ -12,7 +14,7 @@ class Post {
     this.channel,
     this.avatarUrl,
     this.dateTime,
-    this.imageUrls,
+    this.mediaUrl,
     this.videoUrl,
     this.viewsCount,
   );

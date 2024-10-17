@@ -1,12 +1,9 @@
+import 'package:durovswall/features/wall/domain/post.dart';
 import 'package:durovswall/features/wall/presentation/bloc/posts_list_bloc.dart';
 import 'package:durovswall/features/wall/presentation/widgets/post_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-import 'package:talker_flutter/talker_flutter.dart';
-
-// todo: десь блокується мейн тред, не рухається індикатор
-// for starting server npx http-server build/web --cors
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class WallScreen extends StatefulWidget {
   const WallScreen({super.key});
@@ -16,6 +13,11 @@ class WallScreen extends StatefulWidget {
 }
 
 class _WallScreenState extends State<WallScreen> {
+  static const _pageSize = 10;
+
+  final PagingController<int, Post> _pagingController =
+      PagingController(firstPageKey: 0);
+
   void _fetchPosts() {
     BlocProvider.of<PostsListBloc>(context).add(FetchPostsEvent());
   }
@@ -55,14 +57,13 @@ class _WallScreenState extends State<WallScreen> {
               return ListView.builder(
                   itemCount: state.listOfPosts.length,
                   itemBuilder: (context, index) {
-                    // GetIt.I<Talker>().warning(state.listOfPosts.length);
                     final post = state.listOfPosts[index];
 
                     return PostWidget(
                       title: post.channel ?? '',
                       postTextHtml: post.postTextHtml ?? '',
                       avatarUrl: post.avatarUrl ?? '',
-                      imageUrls: post.imageUrls ?? [],
+                      imageUrls: post.mediaUrl ?? [],
                     );
                   });
             }

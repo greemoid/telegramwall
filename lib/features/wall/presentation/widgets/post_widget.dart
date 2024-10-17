@@ -127,6 +127,7 @@
 //     'друзья я прекрасно понимаю что уже давно не выпускал новой музыки но это потому что все силы максимально брошены в альбом ХАН. Мне не хочется до альбома ХАН выпускать ничего что могло бы опустить уровень ожидания а потому прошу вас потерпеть еще совсем немного альбом почти готов';
 
 
+import 'package:durovswall/features/wall/domain/media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:full_screen_image/full_screen_image.dart';
@@ -143,7 +144,7 @@ class PostWidget extends StatelessWidget {
   final String title;
   final String postTextHtml;
   final String avatarUrl;
-  final List<String> imageUrls;
+  final List<Media> imageUrls;
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +205,7 @@ class PostWidget extends StatelessWidget {
                           return FullScreenWidget(
                             disposeLevel: DisposeLevel.Low,
                             child: Image.network(
-                              imageUrls[index],
+                              imageUrls[index].imageUrl ?? '',
                               fit: BoxFit.cover,
                               loadingBuilder: (context, child, progress) {
                                 if (progress == null) return child;

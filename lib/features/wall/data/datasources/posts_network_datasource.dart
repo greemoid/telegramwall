@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:durovswall/features/wall/data/models/media_model.dart';
 import 'package:durovswall/features/wall/data/models/post_model.dart';
 import 'package:get_it/get_it.dart';
 import 'package:html/dom.dart' as dom;
@@ -17,28 +18,16 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
   @override
   Future<List<PostModel>> parsePosts() async {
     try {
+      final start = DateTime.now();
       final response = await dio.get(
-        // 'https://corsproxy.io/?https://t.me/s/book_uaa',
         'https://durovswall.pockethost.io/api/collections/tg_posts/records',
-        // options: Options(
-        //   headers: {
-        //     "Access-Control-Allow-Origin": "*",
-        //     // Required for CORS support to work
-        //     "Access-Control-Allow-Credentials": true,
-        //     // Required for cookies, authorization headers with HTTPS
-        //     "Access-Control-Allow-Headers":
-        //         "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
-        //     "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
-        //   },
       );
-      // todo: handle return codes
-      // GetIt.I<Talker>().info(response.data);
-      // return (response.data as List).map((json) => PostModel.fromJson(json)).toList();
-
-      // GetIt.I<Talker>().info(response.data['items']);
 
       final items = response.data['items'];
       List<String> channelHtmlList = [];
+
+      final gotFromNetwork = DateTime.now();
+      GetIt.I<Talker>().warning('Got htmls from network ${gotFromNetwork.millisecondsSinceEpoch - start.millisecondsSinceEpoch} milliseconds = ${(gotFromNetwork.millisecondsSinceEpoch - start.millisecondsSinceEpoch) / 1000} seconds');
 
       for (var item in items) {
         if (item['channelHtml'] != null) {
@@ -50,24 +39,18 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
 
       for (String channelHtml in channelHtmlList) {
         dom.Document document = parser.parse(channelHtml);
-        // Process the document as needed...
 
         final posts =
             document.getElementsByClassName('tgme_widget_message_wrap');
-        // var postTextHtml = '';
-        // var channel = '';
-        // String? avatarUrl = '';
-        // var dateTime = '';
-        // List<String> imageUrls = [];
-        // List<String> videoUrls = [];
-        var viewsCount = '';
         for (final post in posts) {
           // Initialize or reset data for the current post
           var postTextHtml = '';
           var channel = '';
           String? avatarUrl = '';
           var dateTime = '';
-          List<String> imageUrls = []; // Clear imageUrls for each new post
+          // List<String> imageUrls = []; // Clear imageUrls for each new post
+          // List<String> videoUrls = []; // Clear imageUrls for each new post
+          List<MediaModel> mediaUrls = [];
           var viewsCount = '';
 
           // Extract owner name
@@ -105,49 +88,47 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
             for (var imageElement in imageList) {
               // Get the style attribute
               String? style = imageElement?.attributes['style'];
-
+              String? imageUrl;
               // Use a regex to extract the URL from the style
               if (style != null) {
                 final regex = RegExp(r"url\('?(.*?)'?\)", caseSensitive: false);
                 final match = regex.firstMatch(style);
                 if (match != null && match.groupCount > 0) {
-                  imageUrls
-                      .add(match.group(1) ?? ''); // Add the URL to the list
+                  imageUrl = match.group(1) ?? '';
+                  mediaUrls.add(MediaModel(false, imageUrl, ''));
+                  // imageUrls
+                  //     .add(match.group(1) ?? ''); // Add the URL to the list
                 }
               }
             }
           }
 
-          // todo: make a placeholder with button that goes to telegram
-          // todo: add video_player_media_kit lib
-          // Extract image urls
-          // List<dom.Element?> videoList = [];
-          // var videoListElement =
-          // videoList.add(post.querySelector('.tgme_widget_message_video_thumb'));
-          //
-          // if (videoList.isNotEmpty) {
-          //   for (var videoElement in videoList) {
-          //     // Get the style attribute
-          //     String? style = videoElement?.attributes['style'];
-          //     GetIt.I<Talker>().warning('style: $style');
-          //
-          //     // Use a regex to extract the URL from the style
-          //     if (style != null) {
-          //       final regex = RegExp(r"url\('?(.*?)'?\)", caseSensitive: false);
-          //       final match = regex.firstMatch(style);
-          //       GetIt.I<Talker>().warning('style: $match');
-          //       if (match != null && match.groupCount > 0) {
-          //         videoUrls.add(match.group(1) ?? ''); // Add the URL to the list
-          //       }
-          //     }
-          //   }
-          //   for (var str in videoUrls) {
-          //     GetIt.I<Talker>().warning(str);
-          //   }
-          // }
+          // Parse the video link
+          var videoElement = post.querySelector('a.tgme_widget_message_video_player');
+          String? videoLink = videoElement?.attributes['href']; // Get the video URL
+
+          // Parse the video thumbnail (background image)
+          var thumbElement = videoElement?.querySelector('.tgme_widget_message_video_thumb');
+          String? style = thumbElement?.attributes['style'];
+          String? thumbnailUrl;
+
+          if (style != null) {
+            final regex = RegExp(r"url\('?(.*?)'?\)", caseSensitive: false);
+            final match = regex.firstMatch(style);
+            if (match != null && match.groupCount > 0) {
+              thumbnailUrl = match.group(1); // Get the thumbnail URL
+              mediaUrls.add(MediaModel(true, '', thumbnailUrl));
+            }
+          }
+
+          // GetIt.I<Talker>().warning('Video link: $videoLink');
+          // GetIt.I<Talker>().warning('Thumbnail URL: $thumbnailUrl');
+          for (var media in mediaUrls) {
+            GetIt.I<Talker>().warning('Media: ${media.toString()}');
+          }
 
           final postModel = PostModel(postTextHtml, channel, avatarUrl,
-              dateTime, imageUrls, '', viewsCount);
+              dateTime, mediaUrls, '', viewsCount);
 
           listOfPosts.add(postModel);
         }
@@ -158,6 +139,8 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
         DateTime dateB = DateTime.parse(b.dateTime ?? '');
         return dateA.compareTo(dateB);
       });
+      final end = DateTime.now();
+      GetIt.I<Talker>().warning('Parsed everything: ${end.millisecondsSinceEpoch - start.millisecondsSinceEpoch} milliseconds = ${(end.millisecondsSinceEpoch - start.millisecondsSinceEpoch) / 1000} seconds');
       return listOfPosts;
     } catch (e, st) {
       GetIt.I<Talker>().handle(e, st);
