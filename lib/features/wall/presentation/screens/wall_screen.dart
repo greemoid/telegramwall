@@ -1,9 +1,7 @@
-import 'package:durovswall/features/wall/domain/post.dart';
 import 'package:durovswall/features/wall/presentation/bloc/posts_list_bloc.dart';
 import 'package:durovswall/features/wall/presentation/widgets/post_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class WallScreen extends StatefulWidget {
   const WallScreen({super.key});
@@ -13,11 +11,6 @@ class WallScreen extends StatefulWidget {
 }
 
 class _WallScreenState extends State<WallScreen> {
-  static const _pageSize = 10;
-
-  final PagingController<int, Post> _pagingController =
-      PagingController(firstPageKey: 0);
-
   void _fetchPosts() {
     BlocProvider.of<PostsListBloc>(context).add(FetchPostsEvent());
   }
@@ -31,16 +24,16 @@ class _WallScreenState extends State<WallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E1621),
+      backgroundColor: const Color(0xFFFFFFFF),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
         child: BlocConsumer<PostsListBloc, PostsListState>(
           listener: (context, state) {
             if (state is PostsListError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                     content: Text(state.message,
-                        style: const TextStyle(color: Colors.white))),
+                        style: const TextStyle(color: Colors.black))),
               );
             }
           },
@@ -48,13 +41,13 @@ class _WallScreenState extends State<WallScreen> {
             if (state is PostsListLoading) {
               return const Center(
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: Color(0xFF101010),
                 ),
               );
             }
 
             if (state is PostsListLoaded) {
-              return ListView.builder(
+              return ListView.separated(
                   itemCount: state.listOfPosts.length,
                   itemBuilder: (context, index) {
                     final post = state.listOfPosts[index];
@@ -65,7 +58,12 @@ class _WallScreenState extends State<WallScreen> {
                       avatarUrl: post.avatarUrl ?? '',
                       mediaUrls: post.mediaUrl ?? [],
                     );
-                  });
+                  }, separatorBuilder: (BuildContext context, int index) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Divider(thickness: 1, color: Color(0x15101010),),
+                    );
+              },);
             }
             return const SizedBox();
           },

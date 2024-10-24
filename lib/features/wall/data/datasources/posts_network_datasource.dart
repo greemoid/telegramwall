@@ -15,6 +15,7 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
 
   PostsNetworkDataSourceImpl({required this.dio});
 
+  // todo: через бот сюди потрібно передавати айдішник і потім вже по айдішнику брати пости
   @override
   Future<List<PostModel>> parsePosts() async {
     try {
