@@ -2,7 +2,6 @@ import 'package:durovswall/features/wall/presentation/bloc/posts_list_bloc.dart'
 import 'package:durovswall/features/wall/presentation/widgets/post_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:telegram_web_app/telegram_web_app.dart';
 
 class WallScreen extends StatefulWidget {
   const WallScreen({super.key});
@@ -25,9 +24,6 @@ class _WallScreenState extends State<WallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(TelegramWebApp.instance.platform),
-      ),
       backgroundColor: const Color(0xFFFFFFFF),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
@@ -52,22 +48,27 @@ class _WallScreenState extends State<WallScreen> {
 
             if (state is PostsListLoaded) {
               return ListView.separated(
-                  itemCount: state.listOfPosts.length,
-                  itemBuilder: (context, index) {
-                    final post = state.listOfPosts[index];
+                itemCount: state.listOfPosts.length,
+                itemBuilder: (context, index) {
+                  final post = state.listOfPosts[index];
 
-                    return PostWidget(
-                      title: post.channel ?? '',
-                      postTextHtml: post.postTextHtml ?? '',
-                      avatarUrl: post.avatarUrl ?? '',
-                      mediaUrls: post.mediaUrl ?? [],
-                    );
-                  }, separatorBuilder: (BuildContext context, int index) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Divider(thickness: 1, color: Color(0x15101010),),
-                    );
-              },);
+                  return PostWidget(
+                    title: post.channel ?? '',
+                    postTextHtml: post.postTextHtml ?? '',
+                    avatarUrl: post.avatarUrl ?? '',
+                    mediaUrls: post.mediaUrl ?? [],
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Divider(
+                      thickness: 1,
+                      color: Color(0x15101010),
+                    ),
+                  );
+                },
+              );
             }
             return const SizedBox();
           },

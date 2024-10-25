@@ -16,7 +16,6 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
 
   PostsNetworkDataSourceImpl({required this.dio});
 
-  // todo: через бот сюди потрібно передавати айдішник і потім вже по айдішнику брати пости
   @override
   Future<List<PostModel>> parsePosts() async {
     try {
@@ -52,8 +51,6 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
           var channel = '';
           String? avatarUrl = '';
           var dateTime = '';
-          // List<String> imageUrls = []; // Clear imageUrls for each new post
-          // List<String> videoUrls = []; // Clear imageUrls for each new post
           List<MediaModel> mediaUrls = [];
           var viewsCount = '';
 
@@ -110,8 +107,6 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
           // Parse the video link
           var videoElement =
               post.querySelector('a.tgme_widget_message_video_player');
-          String? videoLink =
-              videoElement?.attributes['href']; // Get the video URL
 
           // Parse the video thumbnail (background image)
           var thumbElement =
