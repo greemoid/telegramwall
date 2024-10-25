@@ -19,6 +19,7 @@ void main() {
         Future.delayed(
             const Duration(seconds: 1), TelegramWebApp.instance.expand);
       }
+      TelegramWebApp.instance.disableVerticalSwipes();
     } catch (e) {
       GetIt.I<Talker>()
           .info("Error happened in Flutter while loading Telegram $e");

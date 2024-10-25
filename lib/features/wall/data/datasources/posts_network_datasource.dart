@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:telegram_web_app/telegram_web_app.dart';
 
 abstract interface class PostsNetworkDatasource {
   Future<List<PostModel>> parsePosts();
@@ -19,9 +20,10 @@ class PostsNetworkDataSourceImpl implements PostsNetworkDatasource {
   @override
   Future<List<PostModel>> parsePosts() async {
     try {
+      final userId = TelegramWebApp.instance.initData.user.id;
       final start = DateTime.now();
       final response = await dio.get(
-        'https://durovswall.pockethost.io/api/collections/tg_posts/records',
+        'https://durovswall.pockethost.io/api/collections/tg_posts/records?filter=(userId=$userId)',
       );
 
       final items = response.data['items'];
