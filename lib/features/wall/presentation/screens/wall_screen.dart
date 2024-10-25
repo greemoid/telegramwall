@@ -2,6 +2,7 @@ import 'package:durovswall/features/wall/presentation/bloc/posts_list_bloc.dart'
 import 'package:durovswall/features/wall/presentation/widgets/post_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:telegram_web_app/telegram_web_app.dart';
 
 class WallScreen extends StatefulWidget {
   const WallScreen({super.key});
@@ -24,6 +25,9 @@ class _WallScreenState extends State<WallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(TelegramWebApp.instance.platform),
+      ),
       backgroundColor: const Color(0xFFFFFFFF),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),

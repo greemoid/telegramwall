@@ -9,9 +9,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:telegram_web_app/telegram_web_app.dart';
 
 void main() {
-  runZonedGuarded(() {
+  runZonedGuarded(() async {
+    try {
+      if (TelegramWebApp.instance.isSupported) {
+        TelegramWebApp.instance.ready();
+        Future.delayed(
+            const Duration(seconds: 1), TelegramWebApp.instance.expand);
+      }
+    } catch (e) {
+      GetIt.I<Talker>()
+          .info("Error happened in Flutter while loading Telegram $e");
+      // add delay for 'Telegram seldom not loading' bug
+      await Future.delayed(const Duration(milliseconds: 200));
+      main();
+      return;
+    }
+
+    FlutterError.onError = (details) {
+      GetIt.I<Talker>().info("Flutter error happened: $details");
+    };
+
     WidgetsFlutterBinding.ensureInitialized();
 
     final talker = TalkerFlutter.init();
@@ -44,54 +64,6 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const WallScreen(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
